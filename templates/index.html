@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Udayana - Powered by RAG & LangChain</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/logo-1.svg') }}" alt="Logo Universitas Udayana">
+                <h1>Chatbot Udayana</h1>
+            </div>
+            <p class="subtitle">Powered by RAG & LangChain</p>
+        </header>
+
+        <main class="chat-box">
+            <div class="messages" id="chat-messages">
+                <div class="message bot-message">
+                    <div class="message-content">
+                        <p>Halo! Saya adalah asisten AI Universitas Udayana. Bagaimana saya bisa membantu Anda hari ini?</p>
+                    </div>
+                </div>
+                <!-- Messages will be added here dynamically -->
+            </div>
+        </main>
+
+        <footer class="chat-input-container">
+            <form id="chat-form">
+                <div class="input-group">
+                    <textarea 
+                        id="chat-input" 
+                        placeholder="Ketik pesan Anda di sini..." 
+                        rows="1"
+                        autofocus
+                    ></textarea>
+                    <button type="submit" id="send-button">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+            <div class="disclaimer">
+                <p>Chatbot ini menggunakan teknologi RAG (Retrieval Augmented Generation) dengan LangChain dan OpenAI.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
