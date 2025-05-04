@@ -1,3 +1,11 @@
+// Deklarasi variabel global untuk bisa diakses oleh script lain
+window.addMessage = null;
+window.addErrorMessage = null;
+window.addLoadingIndicator = null;
+window.sendMessageToServer = null;
+window.toggleInputState = null;
+window.scrollToBottom = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('chat-form');
     const chatInput = document.getElementById('chat-input');
@@ -21,27 +29,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!question) return;
         
         // Tambahkan pesan user ke chat
-        addMessage(question, 'user');
+        window.addMessage(question, 'user');
         
         // Reset input
         chatInput.value = '';
         chatInput.style.height = 'auto';
         
         // Disable input during processing
-        toggleInputState(false);
+        window.toggleInputState(false);
         
         // Tampilkan loading indicator
-        const loadingIndicator = addLoadingIndicator();
+        const loadingIndicator = window.addLoadingIndicator();
         
         try {
             // Kirim permintaan ke server
-            const response = await sendMessageToServer(question, chatHistory);
+            const response = await window.sendMessageToServer(question, chatHistory);
             
             // Hapus loading indicator
             loadingIndicator.remove();
             
             // Tambahkan respon bot ke chat
-            addMessage(response.answer, 'bot');
+            window.addMessage(response.answer, 'bot');
             
             // Update history chat
             chatHistory = response.history;
@@ -50,17 +58,35 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingIndicator.remove();
             
             // Tampilkan pesan error
-            addErrorMessage(error.message || 'Terjadi kesalahan saat memproses permintaan Anda.');
+            window.addErrorMessage(error.message || 'Terjadi kesalahan saat memproses permintaan Anda.');
             console.error('Error:', error);
         } finally {
             // Re-enable input
-            toggleInputState(true);
+            window.toggleInputState(true);
             chatInput.focus();
         }
     });
     
     // Fungsi untuk mengirim pesan ke server
-    async function sendMessageToServer(question, history) {
+    window.sendMessageToServer = async function(question, history) {
+        // Mode demo untuk "Go Live" tanpa server backend
+        if (window.location.protocol === 'file:' || 
+            window.location.hostname === '127.0.0.1' || 
+            window.location.hostname === 'localhost') {
+            // Simulasi delay respons server
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Respons demo
+            return {
+                answer: "Ini adalah respons demo karena Anda membuka halaman secara langsung tanpa server backend. Untuk fungsionalitas penuh, jalankan aplikasi dengan Flask menggunakan 'python run.py'.",
+                history: [
+                    { role: "user", content: question },
+                    { role: "assistant", content: "Ini adalah respons demo karena Anda membuka halaman secara langsung tanpa server backend. Untuk fungsionalitas penuh, jalankan aplikasi dengan Flask menggunakan 'python run.py'." }
+                ]
+            };
+        }
+        
+        // Kode untuk integrasi dengan server Flask
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
@@ -78,10 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         return await response.json();
-    }
+    };
     
     // Fungsi untuk menambahkan pesan ke chat
-    function addMessage(text, sender) {
+    window.addMessage = function(text, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', `${sender}-message`);
         
@@ -100,11 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.appendChild(messageDiv);
         
         // Auto-scroll ke pesan terbaru
-        scrollToBottom();
-    }
+        window.scrollToBottom();
+    };
     
     // Fungsi untuk menambahkan pesan error
-    function addErrorMessage(text) {
+    window.addErrorMessage = function(text) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', 'bot-message', 'error-message');
         
@@ -116,11 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
         chatMessages.appendChild(messageDiv);
         
         // Auto-scroll ke pesan terbaru
-        scrollToBottom();
-    }
+        window.scrollToBottom();
+    };
     
     // Fungsi untuk menambahkan loading indicator
-    function addLoadingIndicator() {
+    window.addLoadingIndicator = function() {
         const loadingDiv = document.createElement('div');
         loadingDiv.classList.add('message', 'bot-message', 'loading-indicator');
         
@@ -130,21 +156,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         chatMessages.appendChild(loadingDiv);
-        scrollToBottom();
+        window.scrollToBottom();
         
         return loadingDiv;
-    }
+    };
     
     // Fungsi untuk toggle state input
-    function toggleInputState(enabled) {
+    window.toggleInputState = function(enabled) {
         chatInput.disabled = !enabled;
         sendButton.disabled = !enabled;
-    }
+    };
     
     // Fungsi untuk auto-scroll ke bawah
-    function scrollToBottom() {
+    window.scrollToBottom = function() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
+    };
     
     // Handle enter key pada textarea (kirim dengan Enter, baris baru dengan Shift+Enter)
     chatInput.addEventListener('keydown', (e) => {
