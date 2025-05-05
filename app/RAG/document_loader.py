@@ -39,7 +39,7 @@ def load_documents() -> List[Document]:
         chunk_size=Config.CHUNK_SIZE,
         chunk_overlap=Config.CHUNK_OVERLAP,
         length_function=len,
-        is_separator_regex=False,
+        # Menghapus parameter is_separator_regex yang sudah tidak didukung
     )
     
     _documents = text_splitter.split_documents(documents)
