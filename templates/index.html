@@ -4,31 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot Udayana - Powered by RAG & LangChain</title>
-    <!-- CSS: Gunakan path relatif untuk "Go Live" dan Flask URL -->
-    <link rel="stylesheet" href="../static/css/style.css">
-    <!-- Fallback untuk Flask jika path di atas tidak berfungsi -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Periksa apakah CSS sudah dimuat dengan benar
-            const style = getComputedStyle(document.body);
-            if (style.backgroundColor === 'rgba(0, 0, 0, 0)') {
-                // Jika CSS tidak dimuat, coba dengan cara Flask
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = "{{ url_for('static', filename='css/style.css') }}";
-                document.head.appendChild(link);
-            }
-        });
-    </script>
+    
+    <!-- CSS: Hanya gunakan Flask url_for untuk konsistensi -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
     <!-- Font Awesome untuk ikon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Flag untuk menandai halaman dirender oleh Flask -->
+    <meta name="rendered-by" content="flask-server">
 </head>
 <body>
     <div class="chat-container">
         <header class="chat-header">
             <div class="logo">
-                <!-- Gunakan path relatif untuk logo -->
-                <img src="../static/img/logo-1.svg" alt="Logo Universitas Udayana" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/logo-1.svg') }}';">
+                <!-- Gunakan url_for Flask untuk logo -->
+                <img src="{{ url_for('static', filename='img/logo-1.svg') }}" alt="Logo Universitas Udayana">
                 <h1>Chatbot Udayana</h1>
             </div>
             <p class="subtitle">Powered by RAG & LangChain</p>
@@ -60,25 +51,12 @@
                 </div>
             </form>
             <div class="disclaimer">
-                <!-- <p>Chatbot ini menggunakan teknologi RAG (Retrieval Augmented Generation) dengan LangChain dan OpenAI.</p> -->
-                <p>This chatbot using RAG technology with Langchain & OpenAI</p>
+                <p>Chatbot ini menggunakan teknologi RAG (Retrieval Augmented Generation) dengan LangChain dan OpenAI.</p>
             </div>
         </footer>
     </div>
 
-    <!-- JavaScript: Gunakan path relatif untuk "Go Live" -->
-    <script src="../static/js/script.js"></script>
-    <!-- Script fallback untuk Flask -->
-    <script>
-        // Periksa apakah script utama gagal dimuat (dengan mengecek apakah fungsi kunci tidak ada)
-        setTimeout(function() {
-            if (typeof addMessage === 'undefined') {
-                // Jika script belum dimuat, coba dengan cara Flask
-                const script = document.createElement('script');
-                script.src = "{{ url_for('static', filename='js/script.js') }}";
-                document.body.appendChild(script);
-            }
-        }, 500);
-    </script>
+    <!-- JavaScript: Hanya gunakan Flask url_for untuk konsistensi -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
