@@ -69,10 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Fungsi untuk mengirim pesan ke server
     window.sendMessageToServer = async function(question, history) {
-        // Mode demo untuk "Go Live" tanpa server backend
-        if (window.location.protocol === 'file:' || 
-            window.location.hostname === '127.0.0.1' || 
-            window.location.hostname === 'localhost') {
+        // Periksa apakah halaman dirender oleh Flask
+        const isFlaskRendered = document.querySelector('meta[name="rendered-by"][content="flask-server"]') !== null;
+        
+        // Mode demo hanya jika file dibuka langsung (protocol file://) atau tidak ada indikator Flask
+        if (window.location.protocol === 'file://' || !isFlaskRendered) {
+            console.log("Mode demo terdeteksi: Halaman tidak dirender oleh Flask");
             // Simulasi delay respons server
             await new Promise(resolve => setTimeout(resolve, 1500));
             
@@ -86,24 +88,43 @@ document.addEventListener('DOMContentLoaded', () => {
             };
         }
         
+        console.log("Mengirim permintaan ke server Flask");
+        
         // Kode untuk integrasi dengan server Flask
-        const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                question,
-                history
-            })
-        });
-        
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Server error');
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    question,
+                    history
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Server error');
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error("Error accessing API:", error);
+            
+            // Jika terjadi error network, periksa apakah ini karena file dibuka langsung
+            if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+                return {
+                    answer: "Tidak dapat terhubung ke server backend. Pastikan server Flask berjalan dengan benar di http://localhost:5000.",
+                    history: [
+                        { role: "user", content: question },
+                        { role: "assistant", content: "Tidak dapat terhubung ke server backend. Pastikan server Flask berjalan dengan benar di http://localhost:5000." }
+                    ]
+                };
+            }
+            
+            throw error; // Re-throw error lainnya
         }
-        
-        return await response.json();
     };
     
     // Fungsi untuk menambahkan pesan ke chat
