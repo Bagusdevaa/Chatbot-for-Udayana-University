@@ -1,4 +1,4 @@
-// Deklarasi variabel global untuk bisa diakses oleh script lain
+// Declaration of global variables to be accessed by other scripts
 window.addMessage = null;
 window.addErrorMessage = null;
 window.addLoadingIndicator = null;
@@ -13,10 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendButton = document.getElementById('send-button');
     const rebuildIndexBtn = document.getElementById('rebuild-index-btn');
     
-    // Menyimpan history chat
+    // Store chat history
     let chatHistory = [];
     
-    // Auto-resize textarea berdasarkan konten
+    // Auto-resize textarea based on content
     chatInput.addEventListener('input', () => {
         chatInput.style.height = 'auto';
         chatInput.style.height = (chatInput.scrollHeight) + 'px';
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const question = chatInput.value.trim();
         if (!question) return;
         
-        // Tambahkan pesan user ke chat
+        // Add user message to chat
         window.addMessage(question, 'user');
         
         // Reset input
@@ -39,27 +39,27 @@ document.addEventListener('DOMContentLoaded', () => {
         // Disable input during processing
         window.toggleInputState(false);
         
-        // Tampilkan loading indicator
+        // Show loading indicator
         const loadingIndicator = window.addLoadingIndicator();
         
         try {
-            // Kirim permintaan ke server
+            // Send request to server
             const response = await window.sendMessageToServer(question, chatHistory);
             
-            // Hapus loading indicator
+            // Remove loading indicator
             loadingIndicator.remove();
             
-            // Tambahkan respon bot ke chat
+            // Add bot response to chat
             window.addMessage(response.answer, 'bot');
             
-            // Update history chat
+            // Update chat history
             chatHistory = response.history;
         } catch (error) {
-            // Hapus loading indicator
+            // Remove loading indicator
             loadingIndicator.remove();
             
-            // Tampilkan pesan error
-            window.addErrorMessage(error.message || 'Terjadi kesalahan saat memproses permintaan Anda.');
+            // Display error message
+            window.addErrorMessage(error.message || 'An error occurred while processing your request.');
             console.error('Error:', error);
         } finally {
             // Re-enable input
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Handle rebuild index button click
     if (rebuildIndexBtn) {
         rebuildIndexBtn.addEventListener('click', async () => {
-            if (confirm('Apakah Anda yakin ingin memperbarui basis pengetahuan? Proses ini mungkin memerlukan waktu beberapa saat.')) {
+            if (confirm('Are you sure you want to update the knowledge base? This process may take some time.')) {
                 try {
                     // Disable button and show loading state
                     rebuildIndexBtn.disabled = true;
@@ -92,11 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     // Show success message in chat
-                    window.addMessage('Basis pengetahuan telah berhasil diperbarui! Sekarang saya memiliki informasi terbaru tentang Universitas Udayana.', 'bot');
+                    window.addMessage('Knowledge base has been successfully updated! Now I have the latest information about Udayana University.', 'bot');
                     
                 } catch (error) {
                     console.error('Error rebuilding index:', error);
-                    window.addErrorMessage('Gagal memperbarui basis pengetahuan: ' + error.message);
+                    window.addErrorMessage('Failed to update knowledge base: ' + error.message);
                 } finally {
                     // Reset button state
                     rebuildIndexBtn.disabled = false;
@@ -106,30 +106,30 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Fungsi untuk mengirim pesan ke server
+    // Function to send message to server
     window.sendMessageToServer = async function(question, history) {
-        // Periksa apakah halaman dirender oleh Flask
+        // Check if page is rendered by Flask
         const isFlaskRendered = document.querySelector('meta[name="rendered-by"][content="flask-server"]') !== null;
         
-        // Mode demo hanya jika file dibuka langsung (protocol file://) atau tidak ada indikator Flask
+        // Demo mode only if file is opened directly (file:// protocol) or there's no Flask indicator
         if (window.location.protocol === 'file://' || !isFlaskRendered) {
-            console.log("Mode demo terdeteksi: Halaman tidak dirender oleh Flask");
-            // Simulasi delay respons server
+            console.log("Demo mode detected: Page not rendered by Flask");
+            // Simulate server response delay
             await new Promise(resolve => setTimeout(resolve, 1500));
             
-            // Respons demo
+            // Demo response
             return {
-                answer: "Ini adalah respons demo karena Anda membuka halaman secara langsung tanpa server backend. Untuk fungsionalitas penuh, jalankan aplikasi dengan Flask menggunakan 'python run.py'.",
+                answer: "This is a demo response because you opened the page directly without a backend server. For full functionality, run the application with Flask using 'python run.py'.",
                 history: [
                     { role: "user", content: question },
-                    { role: "assistant", content: "Ini adalah respons demo karena Anda membuka halaman secara langsung tanpa server backend. Untuk fungsionalitas penuh, jalankan aplikasi dengan Flask menggunakan 'python run.py'." }
+                    { role: "assistant", content: "This is a demo response because you opened the page directly without a backend server. For full functionality, run the application with Flask using 'python run.py'." }
                 ]
             };
         }
         
-        console.log("Mengirim permintaan ke server Flask");
+        console.log("Sending request to Flask server");
         
-        // Kode untuk integrasi dengan server Flask
+        // Code for integration with Flask server
         try {
             const response = await fetch('/api/chat', {
                 method: 'POST',
@@ -151,22 +151,22 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error("Error accessing API:", error);
             
-            // Jika terjadi error network, periksa apakah ini karena file dibuka langsung
+            // If there's a network error, check if it's because the file was opened directly
             if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
                 return {
-                    answer: "Tidak dapat terhubung ke server backend. Pastikan server Flask berjalan dengan benar di http://localhost:5000.",
+                    answer: "Cannot connect to the backend server. Make sure the Flask server is running correctly at http://localhost:5000.",
                     history: [
                         { role: "user", content: question },
-                        { role: "assistant", content: "Tidak dapat terhubung ke server backend. Pastikan server Flask berjalan dengan benar di http://localhost:5000." }
+                        { role: "assistant", content: "Cannot connect to the backend server. Make sure the Flask server is running correctly at http://localhost:5000." }
                     ]
                 };
             }
             
-            throw error; // Re-throw error lainnya
+            throw error; // Re-throw other errors
         }
     };
     
-    // Fungsi untuk menambahkan pesan ke chat
+    // Function to add message to chat
     window.addMessage = function(text, sender) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', `${sender}-message`);
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageContent = document.createElement('div');
         messageContent.classList.add('message-content');
         
-        // Untuk teks yang mungkin berisi line breaks atau paragraf
+        // For text that may contain line breaks or paragraphs
         const formattedText = text
             .split('\n')
             .filter(line => line.trim() !== '')
@@ -185,11 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.appendChild(messageContent);
         chatMessages.appendChild(messageDiv);
         
-        // Auto-scroll ke pesan terbaru
+        // Auto-scroll to the latest message
         window.scrollToBottom();
     };
     
-    // Fungsi untuk menambahkan pesan error
+    // Function to add error message
     window.addErrorMessage = function(text) {
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', 'bot-message', 'error-message');
@@ -201,11 +201,11 @@ document.addEventListener('DOMContentLoaded', () => {
         messageDiv.appendChild(messageContent);
         chatMessages.appendChild(messageDiv);
         
-        // Auto-scroll ke pesan terbaru
+        // Auto-scroll to the latest message
         window.scrollToBottom();
     };
     
-    // Fungsi untuk menambahkan loading indicator
+    // Function to add loading indicator
     window.addLoadingIndicator = function() {
         const loadingDiv = document.createElement('div');
         loadingDiv.classList.add('message', 'bot-message', 'loading-indicator');
@@ -221,18 +221,18 @@ document.addEventListener('DOMContentLoaded', () => {
         return loadingDiv;
     };
     
-    // Fungsi untuk toggle state input
+    // Function to toggle input state
     window.toggleInputState = function(enabled) {
         chatInput.disabled = !enabled;
         sendButton.disabled = !enabled;
     };
     
-    // Fungsi untuk auto-scroll ke bawah
+    // Function to auto-scroll to bottom
     window.scrollToBottom = function() {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     };
     
-    // Handle enter key pada textarea (kirim dengan Enter, baris baru dengan Shift+Enter)
+    // Handle enter key in textarea (send with Enter, new line with Shift+Enter)
     chatInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();

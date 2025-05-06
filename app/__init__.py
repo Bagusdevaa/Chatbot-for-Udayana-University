@@ -1,7 +1,17 @@
 from flask import Flask
+from typing import Optional
 from config import Config
 
-def create_app(config_class=Config):
+def create_app(config_class=Config) -> Flask:
+    """
+    Create and configure the Flask application.
+    
+    Args:
+        config_class: Configuration class for the application
+        
+    Returns:
+        Flask application instance
+    """
     app = Flask(__name__, 
                 static_folder='../static',
                 template_folder='../templates')

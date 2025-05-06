@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chatbot Udayana - Powered by RAG & LangChain</title>
     
-    <!-- CSS: Hanya gunakan Flask url_for untuk konsistensi -->
+    <!-- CSS: Use Flask url_for for consistency -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
-    <!-- Font Awesome untuk ikon -->
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Flag untuk menandai halaman dirender oleh Flask -->
+    <!-- Flag to indicate page is rendered by Flask -->
     <meta name="rendered-by" content="flask-server">
 </head>
 <body>
     <div class="chat-container">
         <header class="chat-header">
             <div class="logo">
-                <!-- Gunakan url_for Flask untuk logo -->
+                <!-- Use Flask url_for for logo -->
                 <img src="{{ url_for('static', filename='img/logo-1.svg') }}" alt="Logo Universitas Udayana">
                 <h1>Chatbot Udayana</h1>
             </div>
@@ -47,7 +47,7 @@
                 <div class="input-group">
                     <textarea 
                         id="chat-input" 
-                        placeholder="Ketik pesan Anda di sini..." 
+                        placeholder="Type your message here..." 
                         rows="1"
                         autofocus
                     ></textarea>
@@ -57,12 +57,12 @@
                 </div>
             </form>
             <div class="disclaimer">
-                <p>Chatbot ini menggunakan teknologi RAG (Retrieval Augmented Generation) dengan LangChain dan OpenAI.</p>
+                <p>This chatbot uses RAG (Retrieval Augmented Generation) technology with LangChain and OpenAI.</p>
             </div>
         </footer>
     </div>
 
-    <!-- JavaScript: Hanya gunakan Flask url_for untuk konsistensi -->
+    <!-- JavaScript: Use Flask url_for for consistency -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

@@ -7,15 +7,15 @@ from config import Config
 
 logger = logging.getLogger(__name__)
 
-_llm = None
-_llm_chain = None
+_llm: Optional[ChatOpenAI] = None
+_llm_chain: Optional[LLMChain] = None
 
 def get_llm() -> ChatOpenAI:
     """
-    Mendapatkan instance dari model Large Language Model (LLM).
+    Get an instance of the Large Language Model (LLM).
     
     Returns:
-        ChatOpenAI: Instance dari model LLM
+        ChatOpenAI: Instance of the LLM model
     """
     global _llm
     
@@ -39,54 +39,54 @@ def get_llm() -> ChatOpenAI:
 
 def get_llm_chain() -> LLMChain:
     """
-    Mendapatkan chain LLM yang dikonfigurasi dengan prompt template yang sesuai.
+    Get an LLM chain configured with the appropriate prompt template.
     
     Returns:
-        LLMChain: Chain LLM yang telah dikonfigurasi
+        LLMChain: The configured LLM chain
     """
     global _llm_chain
     
     if _llm_chain is None:
         logger.info("Initializing LLM Chain...")
         
-        # Membuat prompt template untuk RAG yang telah disempurnakan
+        # Create an enhanced prompt template for RAG
         prompt_template = """
-        Anda adalah asisten AI khusus untuk Universitas Udayana yang membantu menjawab pertanyaan 
-        tentang universitas, program studi, pendaftaran, dan informasi lainnya berdasarkan data yang tersedia.
+        You are an AI assistant specifically for Udayana University that helps answer questions
+        about the university, study programs, registration, and other information based on available data.
         
-        Riwayat Percakapan:
+        Conversation History:
         {chat_history}
         
-        Berikut ini adalah konteks yang berisi informasi yang relevan dengan pertanyaan pengguna:
+        The following is context containing information relevant to the user's question:
         {context}
         
-        Pertanyaan Pengguna: {question}
+        User Question: {question}
         
-        Berikan jawaban yang akurat dan informatif berdasarkan konteks yang diberikan. 
-        Jawaban harus:
-        1. Fokus pada informasi terkait Universitas Udayana
-        2. Menggunakan informasi dari konteks yang diberikan 
-        3. Informatif dan komprehensif
-        4. Dalam bahasa Indonesia yang baik dan benar
-        5. Menggunakan format yang mudah dibaca
+        Provide an accurate and informative answer based on the given context.
+        The answer should:
+        1. Focus on information related to Udayana University
+        2. Use information from the provided context
+        3. Be informative and comprehensive
+        4. Be in good and correct Indonesian language
+        5. Use a format that is easy to read
         
-        Jika informasi tidak tersedia dalam konteks, katakan dengan jujur bahwa Anda tidak memiliki 
-        informasi yang cukup untuk menjawab pertanyaan tersebut, tetapi Anda akan dengan senang hati 
-        membantu pengguna mendapatkan informasi dari sumber resmi Universitas Udayana.
+        If the information is not available in the context, honestly state that you do not have
+        enough information to answer the question, but you would be happy to
+        help the user get information from the official Udayana University sources.
         
-        Jawaban:
+        Answer:
         """
         
-        # Membuat prompt template dengan variabel yang diperlukan
+        # Create a prompt template with the required variables
         PROMPT = PromptTemplate(
             template=prompt_template,
             input_variables=["context", "question", "chat_history"]
         )
         
-        # Mendapatkan LLM
+        # Get the LLM
         llm = get_llm()
         
-        # Membuat LLM Chain
+        # Create the LLM Chain
         _llm_chain = LLMChain(
             llm=llm,
             prompt=PROMPT,

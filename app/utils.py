@@ -1,6 +1,6 @@
 import os
 import logging
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, 
@@ -9,14 +9,14 @@ logger = logging.getLogger(__name__)
 
 def get_chat_history(chat_history: List[Dict[str, str]]) -> str:
     """
-    Mengubah format riwayat chat dari list of dictionaries menjadi string format
-    yang dapat digunakan oleh LLM.
+    Convert chat history from a list of dictionaries to a string format
+    that can be used by the LLM.
     
     Args:
-        chat_history: List of dictionaries dengan format [{"role": "user", "content": "..."}, ...]
+        chat_history: List of dictionaries in the format [{"role": "user", "content": "..."}, ...]
     
     Returns:
-        String representasi dari chat history dalam format "Human: ... AI: ..."
+        String representation of the chat history in "Human: ... AI: ..." format
     """
     if not chat_history:
         return ""
@@ -37,33 +37,33 @@ def save_chat_history(chat_history: List[Dict[str, str]],
                      question: str, 
                      answer: str) -> List[Dict[str, str]]:
     """
-    Menambahkan pertanyaan dan jawaban baru ke dalam riwayat chat.
+    Add a new question and answer to the chat history.
     
     Args:
-        chat_history: Riwayat chat sebelumnya
-        question: Pertanyaan pengguna
-        answer: Jawaban dari sistem
+        chat_history: Previous chat history
+        question: User's question
+        answer: System's answer
     
     Returns:
-        Riwayat chat yang telah diperbarui
+        Updated chat history
     """
     new_history = chat_history.copy() if chat_history else []
     
-    # Tambahkan pertanyaan pengguna
+    # Add the user's question
     new_history.append({
         "role": "user",
         "content": question
     })
     
-    # Tambahkan jawaban sistem
+    # Add the system's answer
     new_history.append({
         "role": "assistant",
         "content": answer
     })
     
-    # Batasi jumlah riwayat yang disimpan (opsional)
-    # Ini untuk menghindari token yang terlalu panjang
-    max_history_items = 10  # Menyimpan 5 pasang pertanyaan dan jawaban
+    # Limit the amount of history saved (optional)
+    # This is to avoid tokens being too long
+    max_history_items = 10  # Store 5 pairs of questions and answers
     if len(new_history) > max_history_items:
         new_history = new_history[-max_history_items:]
     
@@ -71,10 +71,10 @@ def save_chat_history(chat_history: List[Dict[str, str]],
 
 def ensure_directory_exists(directory_path: str) -> None:
     """
-    Memastikan direktori yang ditentukan ada, jika tidak, buat direktori.
+    Ensure the specified directory exists, if not, create the directory.
     
     Args:
-        directory_path: Path ke direktori yang akan diperiksa/dibuat
+        directory_path: Path to the directory to check/create
     """
     if not os.path.exists(directory_path):
         os.makedirs(directory_path)

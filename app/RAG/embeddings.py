@@ -6,16 +6,16 @@ from config import Config
 
 logger = logging.getLogger(__name__)
 
-_embeddings = None
+_embeddings: Optional[OpenAIEmbeddings] = None
 
 def get_embeddings() -> OpenAIEmbeddings:
     """
-    Mendapatkan model embeddings yang digunakan untuk mengubah teks menjadi vektor.
-    Fungsi ini menggunakan singleton pattern untuk memastikan hanya ada satu instance
-    dari model embeddings.
+    Get the embeddings model used to convert text into vectors.
+    This function uses a singleton pattern to ensure there is only one instance
+    of the embeddings model.
     
     Returns:
-        OpenAIEmbeddings: Instance model embeddings
+        OpenAIEmbeddings: Instance of the embeddings model
     """
     global _embeddings
     

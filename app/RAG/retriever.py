@@ -1,11 +1,11 @@
 import os
 import logging
-from typing import Optional, List
-# Import dari langchain_community, bukan langchain
+from typing import Optional, List, Any
 from langchain_community.vectorstores import Chroma
 from langchain.embeddings.base import Embeddings
 from langchain.schema import Document
 from langchain.vectorstores.base import VectorStore
+from langchain.schema.retriever import BaseRetriever
 
 from config import Config
 from app.RAG.document_loader import get_documents
@@ -14,19 +14,18 @@ from app.utils import ensure_directory_exists
 
 logger = logging.getLogger(__name__)
 
-_vector_store = None
-_retriever = None
+_vector_store: Optional[VectorStore] = None
+_retriever: Optional[BaseRetriever] = None
 
-def get_vector_store(force_rebuild=False) -> VectorStore:
+def get_vector_store(force_rebuild: bool = False) -> VectorStore:
     """
-    Mendapatkan atau membuat vector store yang digunakan untuk menyimpan
-    dan mengambil embeddings dokumen.
+    Get or create a vector store used to store and retrieve document embeddings.
     
     Args:
-        force_rebuild (bool): Jika True, paksa rebuild vector store meskipun sudah ada
+        force_rebuild (bool): If True, force rebuild the vector store even if it exists
     
     Returns:
-        VectorStore: Instance vector store
+        VectorStore: Vector store instance
     """
     global _vector_store
     
@@ -35,32 +34,32 @@ def get_vector_store(force_rebuild=False) -> VectorStore:
     
     logger.info("Initializing vector store...")
     
-    # Pastikan direktori untuk vector store ada
+    # Ensure the directory for the vector store exists
     vector_store_path = Config.VECTOR_STORE_PATH
     ensure_directory_exists(vector_store_path)
     
-    # Dapatkan embedding model
+    # Get the embedding model
     embeddings = get_embeddings()
     
     try:
-        # Jika force_rebuild = True atau vector store belum ada, buat yang baru
+        # If force_rebuild = True or vector store doesn't exist, create a new one
         if force_rebuild or not os.path.exists(vector_store_path) or not os.listdir(vector_store_path):
             logger.info("Creating new vector store from documents...")
-            # Dapatkan dokumen
+            # Get the documents
             documents = get_documents()
             
             if not documents or len(documents) == 0:
                 logger.warning("No documents found to create vector store. Check your dataset.txt file.")
                 raise ValueError("No documents found to create vector store")
             
-            # Buat vector store baru
+            # Create a new vector store
             _vector_store = Chroma.from_documents(
                 documents=documents,
                 embedding=embeddings,
                 persist_directory=vector_store_path,
             )
             
-            # Simpan vector store ke disk
+            # Save the vector store to disk
             _vector_store.persist()
             logger.info(f"Vector store created and saved to {vector_store_path} with {len(documents)} documents")
         else:
@@ -73,7 +72,7 @@ def get_vector_store(force_rebuild=False) -> VectorStore:
     
     except ImportError as e:
         logger.error(f"Error importing Chroma: {e}")
-        # Menggunakan pesan yang lebih spesifik
+        # Using a more specific message
         raise ImportError("Could not import ChromaDB. Please run: pip install -U chromadb langchain-community")
     except Exception as e:
         logger.error(f"Error creating vector store: {e}")
@@ -81,29 +80,28 @@ def get_vector_store(force_rebuild=False) -> VectorStore:
     
     return _vector_store
 
-def get_retriever(force_rebuild_vector_store=False):
+def get_retriever(force_rebuild_vector_store: bool = False) -> BaseRetriever:
     """
-    Mendapatkan retriever yang digunakan untuk mengambil dokumen yang relevan
-    dengan query user.
+    Get a retriever used to retrieve documents relevant to the user's query.
     
     Args:
-        force_rebuild_vector_store (bool): Jika True, paksa rebuild vector store
+        force_rebuild_vector_store (bool): If True, force rebuild the vector store
     
     Returns:
-        Retriever: Instance retriever
+        BaseRetriever: Retriever instance
     """
     global _retriever
     
     if _retriever is None or force_rebuild_vector_store:
         logger.info("Initializing retriever...")
         
-        # Dapatkan vector store
+        # Get the vector store
         vector_store = get_vector_store(force_rebuild=force_rebuild_vector_store)
         
-        # Buat retriever - menggunakan metode as_retriever dari VectorStore
+        # Create a retriever - using the as_retriever method from VectorStore
         _retriever = vector_store.as_retriever(
             search_type="similarity",
-            search_kwargs={"k": 5}  # Mengambil 5 dokumen teratas yang paling relevan
+            search_kwargs={"k": 5}  # Get the top 5 most relevant documents
         )
         
         logger.info("Retriever initialized")

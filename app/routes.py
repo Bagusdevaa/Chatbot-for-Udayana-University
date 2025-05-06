@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, Response
+from typing import Dict, List, Any, Optional, Tuple, Union
 from app.RAG.retriever import get_retriever
 from app.RAG.llm import get_llm_chain
 from app.utils import get_chat_history, save_chat_history
@@ -9,70 +10,70 @@ logger = logging.getLogger(__name__)
 main = Blueprint('main', __name__)
 
 @main.route('/')
-def index():
-    """Render halaman utama chatbot."""
+def index() -> str:
+    """Render the main chatbot page."""
     return render_template('index.html')
 
 @main.route('/api/chat', methods=['POST'])
-def chat():
-    """Endpoint API untuk mengolah pertanyaan pengguna."""
+def chat() -> Tuple[Response, int]:
+    """API endpoint to process user questions."""
     data = request.json
     question = data.get('question', '')
     chat_history = data.get('history', [])
     
     if not question:
-        return jsonify({"error": "Pertanyaan tidak boleh kosong"}), 400
+        return jsonify({"error": "Question cannot be empty"}), 400
     
     try:
-        # Mengambil retriever yang telah diinisialisasi
+        # Get the initialized retriever
         retriever = get_retriever()
         
-        # Mengambil chain LLM yang telah dikonfigurasi
+        # Get the configured LLM chain
         llm_chain = get_llm_chain()
         
-        # Mencatat pertanyaan pengguna
+        # Log the user's question
         logger.info(f"User question: {question}")
         
-        # Mendapatkan dokumen yang relevan dengan pertanyaan pengguna
+        # Get documents relevant to the user's question
         context_docs = retriever.get_relevant_documents(question)
         
-        # Log jumlah dokumen yang ditemukan
+        # Log the number of documents found
         logger.info(f"Retrieved {len(context_docs)} relevant documents")
         
-        # Gabungkan konten dokumen yang relevan
+        # Combine the content of relevant documents
         context_text = "\n\n".join([doc.page_content for doc in context_docs])
         
-        # Log konteks yang akan digunakan (truncated untuk log)
+        # Log the context that will be used (truncated for log)
         logger.info(f"Context preview: {context_text[:200]}...")
         
-        # Mengolah pertanyaan dengan konteks yang telah diambil
+        # Process the question with the retrieved context
         response = llm_chain.run(
             question=question, 
             context=context_text, 
             chat_history=get_chat_history(chat_history)
         )
         
-        # Log respon untuk debugging
+        # Log the response for debugging
         logger.info(f"AI response: {response[:100]}...")
         
-        # Menyimpan riwayat chat untuk konteks future
+        # Save chat history for future context
         new_history = save_chat_history(chat_history, question, response)
         
         return jsonify({
             "answer": response,
             "history": new_history
-        })
+        }), 200
     
     except Exception as e:
         logger.error(f"Error processing request: {str(e)}", exc_info=True)
         return jsonify({
-            "error": "Terjadi kesalahan saat memproses permintaan Anda.",
+            "error": "An error occurred while processing your request.",
             "details": str(e)
         }), 500
 
 @main.route('/api/rebuild-index', methods=['POST'])
-def rebuild_index():
-    """Endpoint untuk memaksa rebuild vector store."""
+def rebuild_index() -> Tuple[Response, int]:
+    """Endpoint to force rebuild the vector store."""
     try:
         from app.RAG.document_loader import get_documents
         from app.RAG.retriever import get_retriever
@@ -86,7 +87,7 @@ def rebuild_index():
         return jsonify({
             "success": True,
             "message": f"Successfully rebuilt index with {len(docs)} documents"
-        })
+        }), 200
     
     except Exception as e:
         logger.error(f"Error rebuilding index: {str(e)}", exc_info=True)

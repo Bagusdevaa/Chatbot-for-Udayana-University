@@ -1,4 +1,4 @@
-/* Reset CSS dasar */
+/* Basic CSS reset */
 * {
     margin: 0;
     padding: 0;
@@ -14,7 +14,7 @@ body {
     align-items: center;
 }
 
-/* Container utama */
+/* Main container */
 .chat-container {
     width: 90%;
     max-width: 800px;
@@ -145,7 +145,7 @@ body {
     margin-bottom: 0;
 }
 
-/* Indikator loading */
+/* Loading indicator */
 .loading-indicator {
     display: flex;
     align-items: center;
@@ -231,7 +231,7 @@ body {
     color: #888;
 }
 
-/* Responsivitas */
+/* Responsiveness */
 @media (max-width: 600px) {
     .chat-container {
         width: 100%;

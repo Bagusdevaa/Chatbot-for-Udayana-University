@@ -9,17 +9,17 @@ from app.utils import ensure_directory_exists
 
 logger = logging.getLogger(__name__)
 
-_documents = None
+_documents: Optional[List[Document]] = None
 
-def load_documents(force_reload=False) -> List[Document]:
+def load_documents(force_reload: bool = False) -> List[Document]:
     """
-    Memuat dokumen dari dataset.txt dan membagi dokumen menjadi chunk yang lebih kecil.
+    Load documents from dataset.txt and split them into smaller chunks.
     
     Args:
-        force_reload (bool): Jika True, paksa reload dokumen meskipun sudah dimuat
+        force_reload (bool): If True, force reload documents even if already loaded
         
     Returns:
-        List[Document]: List dari dokumen yang telah diproses
+        List[Document]: List of processed documents
     """
     global _documents
     
@@ -67,14 +67,14 @@ def load_documents(force_reload=False) -> List[Document]:
         logger.error(f"Error loading documents: {str(e)}")
         raise
 
-def get_documents(force_reload=False) -> List[Document]:
+def get_documents(force_reload: bool = False) -> List[Document]:
     """
-    Mendapatkan dokumen yang telah dimuat dan diproses.
+    Get documents that have been loaded and processed.
     
     Args:
-        force_reload (bool): Jika True, paksa reload dokumen
+        force_reload (bool): If True, force reload documents
         
     Returns:
-        List[Document]: List dari dokumen yang telah diproses
+        List[Document]: List of processed documents
     """
     return load_documents(force_reload=force_reload)
