@@ -33,6 +33,7 @@ body {
     color: white;
     padding: 15px 20px;
     text-align: center;
+    position: relative;
 }
 
 .logo {
@@ -55,6 +56,39 @@ body {
 .subtitle {
     font-size: 0.9rem;
     opacity: 0.8;
+}
+
+/* Admin Controls */
+.admin-controls {
+    margin-top: 10px;
+    text-align: center;
+}
+
+#rebuild-index-btn {
+    background: #eaeaea;
+    color: #1e4b6e;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#rebuild-index-btn:hover {
+    background: #d1d1d1;
+}
+
+#rebuild-index-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+#rebuild-index-btn i {
+    font-size: 0.9rem;
 }
 
 /* Chat box */
