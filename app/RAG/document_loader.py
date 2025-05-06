@@ -11,16 +11,19 @@ logger = logging.getLogger(__name__)
 
 _documents = None
 
-def load_documents() -> List[Document]:
+def load_documents(force_reload=False) -> List[Document]:
     """
     Memuat dokumen dari dataset.txt dan membagi dokumen menjadi chunk yang lebih kecil.
     
+    Args:
+        force_reload (bool): Jika True, paksa reload dokumen meskipun sudah dimuat
+        
     Returns:
         List[Document]: List dari dokumen yang telah diproses
     """
     global _documents
     
-    if _documents is not None:
+    if _documents is not None and not force_reload:
         return _documents
     
     logger.info("Loading documents from dataset...")
@@ -31,29 +34,47 @@ def load_documents() -> List[Document]:
         raise FileNotFoundError(f"Dataset file not found at {dataset_path}")
     
     # Load the dataset file
-    loader = TextLoader(dataset_path, encoding="utf-8")
-    documents = loader.load()
+    try:
+        loader = TextLoader(dataset_path, encoding="utf-8")
+        documents = loader.load()
+        
+        if not documents:
+            logger.warning(f"No content loaded from {dataset_path}")
+            return []
+        
+        logger.info(f"Successfully loaded raw documents from {dataset_path}")
+        
+        # Split the documents into chunks with better parameters
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=Config.CHUNK_SIZE,
+            chunk_overlap=Config.CHUNK_OVERLAP,
+            length_function=len,
+            separators=["\n\n\n", "\n\n", "\n", " ", ""]
+        )
+        
+        _documents = text_splitter.split_documents(documents)
+        
+        # Log some information about the processed documents
+        logger.info(f"Loaded and split into {len(_documents)} document chunks")
+        if _documents:
+            avg_chunk_size = sum(len(doc.page_content) for doc in _documents) / len(_documents)
+            logger.info(f"Average chunk size: {avg_chunk_size:.2f} characters")
+            logger.info(f"Sample chunk content: {_documents[0].page_content[:100]}...")
+        
+        return _documents
     
-    # Split the documents into chunks
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=Config.CHUNK_SIZE,
-        chunk_overlap=Config.CHUNK_OVERLAP,
-        length_function=len,
-        # Menghapus parameter is_separator_regex yang sudah tidak didukung
-    )
-    
-    _documents = text_splitter.split_documents(documents)
-    logger.info(f"Loaded and split {len(_documents)} document chunks from dataset")
-    
-    return _documents
+    except Exception as e:
+        logger.error(f"Error loading documents: {str(e)}")
+        raise
 
-def get_documents() -> List[Document]:
+def get_documents(force_reload=False) -> List[Document]:
     """
     Mendapatkan dokumen yang telah dimuat dan diproses.
     
+    Args:
+        force_reload (bool): Jika True, paksa reload dokumen
+        
     Returns:
         List[Document]: List dari dokumen yang telah diproses
     """
-    if _documents is None:
-        return load_documents()
-    return _documents
+    return load_documents(force_reload=force_reload)
