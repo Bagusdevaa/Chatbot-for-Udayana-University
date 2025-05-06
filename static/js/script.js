@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chat-input');
     const chatMessages = document.getElementById('chat-messages');
     const sendButton = document.getElementById('send-button');
+    const rebuildIndexBtn = document.getElementById('rebuild-index-btn');
     
     // Menyimpan history chat
     let chatHistory = [];
@@ -66,6 +67,44 @@ document.addEventListener('DOMContentLoaded', () => {
             chatInput.focus();
         }
     });
+    
+    // Handle rebuild index button click
+    if (rebuildIndexBtn) {
+        rebuildIndexBtn.addEventListener('click', async () => {
+            if (confirm('Apakah Anda yakin ingin memperbarui basis pengetahuan? Proses ini mungkin memerlukan waktu beberapa saat.')) {
+                try {
+                    // Disable button and show loading state
+                    rebuildIndexBtn.disabled = true;
+                    rebuildIndexBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                    
+                    // Call the rebuild index API
+                    const response = await fetch('/api/rebuild-index', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to rebuild knowledge base');
+                    }
+                    
+                    // Show success message in chat
+                    window.addMessage('Basis pengetahuan telah berhasil diperbarui! Sekarang saya memiliki informasi terbaru tentang Universitas Udayana.', 'bot');
+                    
+                } catch (error) {
+                    console.error('Error rebuilding index:', error);
+                    window.addErrorMessage('Gagal memperbarui basis pengetahuan: ' + error.message);
+                } finally {
+                    // Reset button state
+                    rebuildIndexBtn.disabled = false;
+                    rebuildIndexBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Update Knowledge';
+                }
+            }
+        });
+    }
     
     // Fungsi untuk mengirim pesan ke server
     window.sendMessageToServer = async function(question, history) {
