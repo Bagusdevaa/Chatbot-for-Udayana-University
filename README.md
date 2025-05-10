@@ -74,19 +74,11 @@ This project is an implementation of an informational chatbot for Udayana Univer
 6. **Access the application**
    - Open your browser and visit `http://localhost:5000`
 
-## Advanced Development
-- Add more data to the dataset to enhance the chatbot's knowledge
-- Implement caching to reduce API usage
-- Optimize parameters such as chunk size and retriever settings
-- Add authentication and conversation logging
-- Improve the UI/UX of the interface
-- Integrate with other university systems
-
 ## Important Notes
 - Ensure your OpenAI API key is securely stored and not shared
-- This application is designed as an educational implementation, not for production
 - Using the OpenAI API incurs costs, monitor your usage
 - The dataset.txt file is used as the active dataset, while data/raw/dataset.txt serves as a backup
+- The dataset.txt was last updated in 2023
 
 ## Updating the Knowledge Base
 If you add new information to the dataset:
