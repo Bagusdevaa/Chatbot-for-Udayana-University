@@ -9,8 +9,7 @@ class Config:
     # Flask configuration
     SECRET_KEY: str = os.environ.get('SECRET_KEY') or 'default-secret-key'
     DEBUG: bool = os.environ.get('DEBUG', 'False').lower() in ('true', 't', '1')
-    
-    # OpenAI API configuration
+      # OpenAI API configuration
     OPENAI_API_KEY: Optional[str] = os.environ.get('OPENAI_API_KEY')
     OPENAI_MODEL: str = os.environ.get('OPENAI_MODEL', 'gpt-3.5-turbo')
     

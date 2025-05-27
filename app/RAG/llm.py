@@ -1,6 +1,6 @@
 import logging
 from typing import Optional
-from langchain.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI  # Perbaikan import ke langchain_openai
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from config import Config

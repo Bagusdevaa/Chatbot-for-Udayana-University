@@ -1,7 +1,7 @@
 import os
 import logging
 from typing import Optional
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings  # Perbaikan import ke langchain_openai
 from config import Config
 
 logger = logging.getLogger(__name__)
